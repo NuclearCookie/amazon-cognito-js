@@ -521,13 +521,17 @@ AWS.CognitoSyncManager.LocalStorage = (function() {
 
                 if (err) { return callback(err); }
 
-                metadata.setLastModifiedDate(new Date());
-                metadata.setLastSyncCount(-1);
+                if ( metadata ) {
+                    metadata.setLastModifiedDate(new Date());
+                    metadata.setLastSyncCount(-1);
 
-                root.updateDatasetMetadata(identityId, metadata, function (err) {
-                    if (err) { return callback(err); }
-                    return callback(null, true);
-                });
+                    root.updateDatasetMetadata(identityId, metadata, function (err) {
+                        if (err) { return callback(err); }
+                        return callback(null, true);
+                    });
+                } else {
+                    return callback("metadata not found", false);
+                }
 
             });
 
@@ -625,15 +629,18 @@ AWS.CognitoSyncManager.LocalStorage = (function() {
                 callback(err);
             }
 
-            meta.setLastSyncCount(lastSyncCount).setLastSyncDate(new Date());
+            if (meta) {
+                meta.setLastSyncCount(lastSyncCount).setLastSyncDate(new Date());
 
-            root.updateDatasetMetadata(identityId, meta, function (err) {
-                if (err) {
-                    callback(err);
-                }
-                callback(null, true);
-            });
-
+                root.updateDatasetMetadata(identityId, meta, function (err) {
+                    if (err) {
+                        callback(err);
+                    }
+                    callback(null, true);
+                });
+            } else {
+                callback("metadata doesn't exist", false);
+            }
         });
 
     };
@@ -664,14 +671,19 @@ AWS.CognitoSyncManager.LocalStorage = (function() {
                 return callback(err);
             }
 
-            meta.setLastModifiedDate(new Date());
+            if ( meta ) {
+                meta.setLastModifiedDate(new Date());
 
-            root.updateDatasetMetadata(identityId, meta, function (err) {
-                if (err) {
-                    return callback(err);
-                }
-                return callback(null, true);
-            });
+                root.updateDatasetMetadata(identityId, meta, function (err) {
+                    if (err) {
+                        return callback(err);
+                    }
+                    return callback(null, true);
+                });
+            } else {
+                return callback("metadata doesn't exist", false);
+            }
+
 
         });
 
